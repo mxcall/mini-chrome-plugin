@@ -11,3 +11,6 @@ wheels/
 .vscode
 .qoder
 uploads/*
+build/*
+dist\uploads
+dist\mini-chrome-plugin\

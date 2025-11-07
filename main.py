@@ -57,6 +57,11 @@ def upload_file():
             }), 400
         
         # 获取安全的文件名
+        if not file.filename:
+            return jsonify({
+                'status': 'error',
+                'message': '文件名为空'
+            }), 400
         original_filename = secure_filename(file.filename)
         
         # 生成唯一文件名
@@ -97,7 +102,8 @@ def main():
     print("监听地址: localhost:19666")
     print(f"文件保存目录: {os.path.abspath(UPLOAD_FOLDER)}")
     print("按 Ctrl+C 停止服务")
-    app.run(host='localhost', port=19666, debug=True)
+    # 打包为exe时必须关闭debug模式
+    app.run(host='localhost', port=19666, debug=False, use_reloader=False)
 
 
 if __name__ == "__main__":
