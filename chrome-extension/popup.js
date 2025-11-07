@@ -4,6 +4,8 @@ const uploadBtn = document.getElementById('uploadBtn');
 const fileName = document.getElementById('fileName');
 const statusMessage = document.getElementById('statusMessage');
 const statusSection = document.getElementById('statusSection');
+const textInput = document.getElementById('textInput');
+const uploadTextBtn = document.getElementById('uploadTextBtn');
 
 let selectedFile = null;
 
@@ -56,7 +58,7 @@ uploadBtn.addEventListener('click', async function() {
             // 上传成功
             const sizeInMB = (result.filesize / (1024 * 1024)).toFixed(2);
             showStatus(
-                `上传成功！\n文件名: ${result.filename}\n大小: ${sizeInMB} MB`,
+                `✓ 文件上传成功！\n文件名: ${result.filename}\n大小: ${sizeInMB} MB\n保存位置: uploads/${result.filename}`,
                 'success'
             );
             
@@ -83,5 +85,57 @@ uploadBtn.addEventListener('click', async function() {
 function showStatus(message, type) {
     statusMessage.textContent = message;
     statusSection.className = `status-section ${type}`;
-    statusSection.style.display = 'block';
 }
+
+// 监听文本上传按钮点击
+uploadTextBtn.addEventListener('click', async function() {
+    const textContent = textInput.value.trim();
+    
+    if (!textContent) {
+        showStatus('请先输入文本内容', 'error');
+        return;
+    }
+    
+    // 禁用按钮，防止重复点击
+    uploadTextBtn.disabled = true;
+    uploadTextBtn.textContent = '上传中...';
+    
+    try {
+        // 将文本转为base64
+        const base64Content = btoa(unescape(encodeURIComponent(textContent)));
+        
+        // 发送POST请求
+        const response = await fetch('http://localhost:19666/upload-text', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                content: base64Content
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.status === 'success') {
+            // 上传成功
+            showStatus(
+                `✓ 文本上传成功！\n字符数: ${result.char_count}\n已复制到剪贴板，可直接 Ctrl+V 粘贴\n保存位置: uploads/copy_tmp.txt`,
+                'success'
+            );
+            
+            // 清空文本框
+            // textInput.value = '';  // 可选：是否清空文本框
+        } else {
+            // 上传失败
+            showStatus(`上传失败: ${result.message || '未知错误'}`, 'error');
+        }
+    } catch (error) {
+        // 网络错误或其他异常
+        console.error('上传错误:', error);
+        showStatus(`上传失败: ${error.message}\n请确保后端服务正在运行`, 'error');
+    } finally {
+        uploadTextBtn.disabled = false;
+        uploadTextBtn.textContent = '上传文本到剪贴板';
+    }
+});

@@ -1,4 +1,6 @@
 import os
+import base64
+import pyperclip
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -95,6 +97,65 @@ def index():
         'upload_endpoint': '/upload',
         'method': 'POST'
     })
+
+
+@app.route('/upload-text', methods=['POST'])
+def upload_text():
+    """
+    处理文本上传请求，将文本保存到copy_tmp.txt并复制到剪贴板
+    """
+    try:
+        # 检查请求数据
+        data = request.get_json()
+        
+        if not data or 'content' not in data:
+            return jsonify({
+                'status': 'error',
+                'message': '请求中没有文本内容'
+            }), 400
+        
+        # 解码base64内容
+        try:
+            base64_content = data['content']
+            decoded_bytes = base64.b64decode(base64_content)
+            text_content = decoded_bytes.decode('utf-8')
+        except Exception as e:
+            return jsonify({
+                'status': 'error',
+                'message': f'base64解码失败: {str(e)}'
+            }), 400
+        
+        if not text_content.strip():
+            return jsonify({
+                'status': 'error',
+                'message': '文本内容为空'
+            }), 400
+        
+        # 保存到copy_tmp.txt文件
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'copy_tmp.txt')
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(text_content)
+        
+        # 复制到剪贴板
+        try:
+            pyperclip.copy(text_content)
+        except Exception as e:
+            return jsonify({
+                'status': 'error',
+                'message': f'复制到剪贴板失败: {str(e)}'
+            }), 500
+        
+        return jsonify({
+            'status': 'success',
+            'char_count': len(text_content),
+            'message': '文本已保存并复制到剪贴板'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'文本上传失败: {str(e)}'
+        }), 500
 
 
 def main():
