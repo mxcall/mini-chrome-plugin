@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件上传</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <h2>文件上传</h2>
+        
+        <div class="upload-section">
+            <input type="file" id="fileInput" accept="*/*">
+            <div class="file-info" id="fileInfo">
+                <span id="fileName">未选择文件</span>
+            </div>
+        </div>
+        
+        <button id="uploadBtn" class="upload-btn" disabled>上传文件</button>
+        
+        <div class="status-section" id="statusSection">
+            <div id="statusMessage"></div>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>
