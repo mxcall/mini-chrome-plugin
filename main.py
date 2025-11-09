@@ -1,5 +1,6 @@
 import os
 import base64
+import subprocess
 import pyperclip
 from datetime import datetime
 from flask import Flask, request, jsonify
@@ -75,6 +76,14 @@ def upload_file():
         
         # 获取文件大小
         file_size = os.path.getsize(filepath)
+        
+        # 自动打开Windows文件管理器,定位到上传文件夹
+        try:
+            upload_folder_abs = os.path.abspath(app.config['UPLOAD_FOLDER'])
+            subprocess.Popen(f'explorer /select,"{filepath}"')
+        except Exception as e:
+            # 文件管理器打开失败不影响上传结果
+            print(f"打开文件管理器失败: {str(e)}")
         
         return jsonify({
             'status': 'success',
