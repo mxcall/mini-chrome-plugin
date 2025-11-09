@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="文件上传PWA应用 - 支持文件和文本上传到本地服务器">
+    <meta name="theme-color" content="#667eea">
+    <title>文件上传助手</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>📁 文件上传助手</h1>
+            <p class="subtitle">本地文件快速上传工具</p>
+        </header>
+
+        <main class="main-content">
+            <!-- 文件上传区域 -->
+            <section class="upload-card">
+                <h2>📤 文件上传</h2>
+                
+                <div class="upload-section">
+                    <label for="fileInput" class="file-label">
+                        <div class="file-drop-zone" id="dropZone">
+                            <div class="drop-icon">📂</div>
+                            <p class="drop-text">点击选择文件或拖拽到此处</p>
+                            <p class="drop-hint">支持任意格式文件,最大3GB</p>
+                        </div>
+                        <input type="file" id="fileInput" accept="*/*">
+                    </label>
+                    
+                    <div class="file-info" id="fileInfo">
+                        <span id="fileName">未选择文件</span>
+                    </div>
+                </div>
+                
+                <button id="uploadBtn" class="upload-btn" disabled>
+                    <span class="btn-icon">⬆️</span>
+                    <span>上传文件</span>
+                </button>
+            </section>
+
+            <!-- 文本上传区域 -->
+            <section class="upload-card">
+                <h2>📝 文本上传</h2>
+                
+                <div class="text-upload-section">
+                    <textarea id="textInput" class="text-area" placeholder="在此输入或粘贴文本内容...&#10;&#10;支持快捷键:&#10;Ctrl+A - 全选&#10;Ctrl+V - 粘贴"></textarea>
+                    <button id="uploadTextBtn" class="upload-btn">
+                        <span class="btn-icon">📋</span>
+                        <span>上传到剪贴板</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 状态显示区域 -->
+            <section class="status-section" id="statusSection">
+                <div id="statusMessage">💡 等待操作...</div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>💻 后端服务: <span id="serverStatus">检测中...</span></p>
+            <p class="footer-hint">确保本地服务运行在 localhost:19666</p>
+        </footer>
+    </div>
+
+    <!-- 安装提示 -->
+    <div class="install-prompt" id="installPrompt" style="display: none;">
+        <div class="install-content">
+            <p>📱 安装此应用到桌面?</p>
+            <div class="install-buttons">
+                <button id="installBtn" class="btn-install">安装</button>
+                <button id="dismissBtn" class="btn-dismiss">稍后</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+PWA 图标占位符
+
+请使用以下任一方式生成图标:
+
+1. 打开 generate-icons.html,下载图标文件
+2. 运行: pip install Pillow && python generate_icons.py
+3. 使用设计工具创建 192x192 和 512x512 的 PNG 图标
+
+图标要求:
+- icon-192.png (192x192 像素)
+- icon-512.png (512x512 像素)
+- PNG 格式
+- 建议使用渐变色背景 (#667eea 到 #764ba2)

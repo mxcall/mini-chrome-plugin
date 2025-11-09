@@ -3,7 +3,7 @@ import base64
 import subprocess
 import pyperclip
 from datetime import datetime
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
@@ -98,9 +98,25 @@ def upload_file():
         }), 500
 
 
-@app.route('/', methods=['GET'])
+@app.route('/')
 def index():
-    """首页提示信息"""
+    """PWA 应用首页"""
+    return send_from_directory('chrome-pwa', 'index.html')
+
+
+@app.route('/<path:path>')
+def serve_pwa_files(path):
+    """提供 PWA 应用的静态文件"""
+    try:
+        return send_from_directory('chrome-pwa', path)
+    except:
+        # 如果文件不存在,返回 404
+        return jsonify({'error': 'File not found'}), 404
+
+
+@app.route('/api/status', methods=['GET'])
+def api_status():
+    """API 状态信息"""
     return jsonify({
         'message': '文件上传服务正在运行',
         'upload_endpoint': '/upload',
@@ -168,10 +184,17 @@ def upload_text():
 
 
 def main():
+    print("="*50)
     print("文件上传服务启动中...")
-    print("监听地址: localhost:19666")
+    print("="*50)
+    print(f"监听地址: http://localhost:19666")
+    print(f"PWA 应用: http://localhost:19666")
     print(f"文件保存目录: {os.path.abspath(UPLOAD_FOLDER)}")
+    print(f"PWA 文件目录: {os.path.abspath('chrome-pwa')}")
+    print("="*50)
+    print("提示: 在浏览器中访问 http://localhost:19666 使用 PWA 应用")
     print("按 Ctrl+C 停止服务")
+    print("="*50)
     # 打包为exe时必须关闭debug模式
     app.run(host='localhost', port=19666, debug=False, use_reloader=False)
 

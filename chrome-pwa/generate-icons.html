@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>生成应用图标</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
+        }
+        .info {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 { color: #333; margin-bottom: 20px; }
+        p { color: #666; line-height: 1.6; margin-bottom: 15px; }
+        .note {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            text-align: left;
+            margin-top: 20px;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+        }
+        .canvas-container {
+            margin: 20px 0;
+        }
+        canvas {
+            border: 2px solid #667eea;
+            border-radius: 8px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>📱 PWA 应用图标</h1>
+        <p>PWA 需要以下尺寸的图标:</p>
+        <ul style="text-align: left; color: #666;">
+            <li><code>icon-192.png</code> - 192x192 像素</li>
+            <li><code>icon-512.png</code> - 512x512 像素</li>
+        </ul>
+
+        <div class="canvas-container">
+            <h3>预览图标 (192x192)</h3>
+            <canvas id="icon192" width="192" height="192"></canvas>
+            <br>
+            <button onclick="downloadIcon(192)">下载 192x192</button>
+        </div>
+
+        <div class="canvas-container">
+            <h3>预览图标 (512x512)</h3>
+            <canvas id="icon512" width="512" height="512"></canvas>
+            <br>
+            <button onclick="downloadIcon(512)">下载 512x512</button>
+        </div>
+
+        <div class="note">
+            <strong>📌 提示:</strong><br>
+            1. 点击下载按钮保存图标<br>
+            2. 将图标文件保存到 <code>chrome-pwa</code> 目录<br>
+            3. 或者使用专业设计工具制作自定义图标
+        </div>
+    </div>
+
+    <script>
+        // 绘制图标
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            
+            // 背景渐变
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // 绘制文件夹图标
+            ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = size * 0.02;
+            
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const iconSize = size * 0.5;
+            
+            // 绘制文件夹
+            ctx.beginPath();
+            ctx.roundRect(
+                centerX - iconSize/2,
+                centerY - iconSize/4,
+                iconSize,
+                iconSize * 0.7,
+                size * 0.04
+            );
+            ctx.fill();
+            
+            // 绘制文件夹顶部标签
+            ctx.beginPath();
+            ctx.roundRect(
+                centerX - iconSize/2,
+                centerY - iconSize/4 - iconSize * 0.15,
+                iconSize * 0.4,
+                iconSize * 0.2,
+                size * 0.02
+            );
+            ctx.fill();
+            
+            // 绘制上传箭头
+            ctx.fillStyle = '#667eea';
+            const arrowSize = iconSize * 0.3;
+            const arrowY = centerY + iconSize * 0.05;
+            
+            // 箭头向上部分
+            ctx.beginPath();
+            ctx.moveTo(centerX, arrowY - arrowSize/2);
+            ctx.lineTo(centerX - arrowSize/3, arrowY);
+            ctx.lineTo(centerX - arrowSize/6, arrowY);
+            ctx.lineTo(centerX - arrowSize/6, arrowY + arrowSize/2);
+            ctx.lineTo(centerX + arrowSize/6, arrowY + arrowSize/2);
+            ctx.lineTo(centerX + arrowSize/6, arrowY);
+            ctx.lineTo(centerX + arrowSize/3, arrowY);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // 初始化绘制
+        drawIcon(document.getElementById('icon192'), 192);
+        drawIcon(document.getElementById('icon512'), 512);
+
+        // 下载图标
+        function downloadIcon(size) {
+            const canvas = document.getElementById('icon' + size);
+            const link = document.createElement('a');
+            link.download = `icon-${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // 兼容性处理
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+                this.moveTo(x + radius, y);
+                this.lineTo(x + width - radius, y);
+                this.quadraticCurveTo(x + width, y, x + width, y + radius);
+                this.lineTo(x + width, y + height - radius);
+                this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                this.lineTo(x + radius, y + height);
+                this.quadraticCurveTo(x, y + height, x, y + height - radius);
+                this.lineTo(x, y + radius);
+                this.quadraticCurveTo(x, y, x + radius, y);
+            };
+        }
+    </script>
+</body>
+</html>
