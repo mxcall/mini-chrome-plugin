@@ -46,7 +46,7 @@ uploadBtn.addEventListener('click', async function() {
         return;
     }
     
-    // 禁用按钮，防止重复点击
+    // 禁用按钮,防止重复点击
     uploadBtn.disabled = true;
     uploadBtn.textContent = '上传中...';
     
@@ -105,7 +105,7 @@ uploadTextBtn.addEventListener('click', async function() {
         return;
     }
     
-    // 禁用按钮，防止重复点击
+    // 禁用按钮,防止重复点击
     uploadTextBtn.disabled = true;
     uploadTextBtn.textContent = '上传中...';
     
