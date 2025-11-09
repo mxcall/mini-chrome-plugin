@@ -1,0 +1,82 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # 当推送 v* 标签时触发（如 v1.0.0）
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置 Python 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+      
+      - name: 安装 uv
+        uses: astral-sh/setup-uv@v4
+      
+      - name: 使用 uv 安装项目依赖
+        run: |
+          uv sync
+      
+      - name: 安装 PyInstaller
+        run: |
+          uv pip install pyinstaller
+      
+      - name: 清理旧的打包文件
+        run: |
+          if (Test-Path build) { Remove-Item -Recurse -Force build }
+          if (Test-Path dist) { Remove-Item -Recurse -Force dist }
+          if (Test-Path temp_zip_folder) { Remove-Item -Recurse -Force temp_zip_folder }
+        shell: pwsh
+      
+      - name: 使用 PyInstaller 打包 EXE
+        run: |
+          uv run pyinstaller build_exe.spec --clean
+        shell: pwsh
+      
+      - name: 打包 Chrome 插件
+        run: |
+          if (Test-Path chrome-extension) {
+            New-Item -ItemType Directory -Force -Path temp_zip_folder\mini-chrome-plugin
+            Copy-Item -Path chrome-extension\* -Destination temp_zip_folder\mini-chrome-plugin\ -Recurse -Force
+            Compress-Archive -Path temp_zip_folder\mini-chrome-plugin -DestinationPath dist\mini-chrome-plugin.zip -Force
+            Remove-Item -Recurse -Force temp_zip_folder
+          } else {
+            Write-Host "警告: 未找到 chrome-extension 目录"
+            exit 1
+          }
+        shell: pwsh
+      
+      - name: 验证打包文件
+        run: |
+          if (-not (Test-Path dist\mini-chrome-plugin-server.exe)) {
+            Write-Host "错误: EXE 文件未生成"
+            exit 1
+          }
+          if (-not (Test-Path dist\mini-chrome-plugin.zip)) {
+            Write-Host "错误: Chrome 插件 ZIP 未生成"
+            exit 1
+          }
+          Write-Host "✓ 所有文件打包成功"
+          Get-ChildItem dist
+        shell: pwsh
+      
+      - name: 创建 Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/mini-chrome-plugin-server.exe
+            dist/mini-chrome-plugin.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
