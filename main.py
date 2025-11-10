@@ -173,7 +173,7 @@ def main():
     print(f"文件保存目录: {os.path.abspath(UPLOAD_FOLDER)}")
     print("按 Ctrl+C 停止服务")
     # 打包为exe时必须关闭debug模式
-    app.run(host='localhost', port=19666, debug=False, use_reloader=False)
+    app.run(host='localhost', port=19666, debug=True, use_reloader=False)
 
 
 if __name__ == "__main__":
