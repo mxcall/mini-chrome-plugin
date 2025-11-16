@@ -19,3 +19,4 @@ dist/uploads
 dist/mini-chrome-plugin/
 dist/*
 
+.claude/
