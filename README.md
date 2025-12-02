@@ -1,5 +1,5 @@
 ## 背景
-发现chrome插件能 "沙箱逃逸"访问不到沙盒外面的localhost:xxx网络(从keepassHttp插件观察到的);   
+发现chrome插件能 "沙箱逃逸", 即能访问到沙盒外面的localhost:xxx网络(从keepassHttp插件观察到的);   
 所以尝试用Qoder新建前后端尝试, 在chrome_104版本中测试成功!!!
 
 ## 需求
